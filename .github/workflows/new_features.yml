@@ -12,5 +12,5 @@ jobs:
     - name: respuesta de job
       env: 
         MENSAJE: Prueba de mensaje
-      run: echo "::set-output name=respuesta::${{MENSAJE}}"
+      run: echo "::set-output name=respuesta::${MENSAJE}"
 
