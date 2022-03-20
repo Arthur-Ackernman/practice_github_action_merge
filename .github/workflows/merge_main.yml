@@ -1,23 +1,21 @@
-name: Merge a develop
+name: Merge a main
 on: 
   push:
-    branches-ignore: [ develop, main, hotfix ]
+    branches: [ develop ]
 jobs:
-  Actualizar-rama:
-    name: Actulizar rama actual con develop
-    if:  ${{ contains(github.event.head_commit.message, 'FEATURES') }}
+  Crear-rama:
+    name: Crear rama realease desde develop
+    if:  ${{ contains(github.event.head_commit.message, 'RELEASE') }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout de repositorio
       uses: actions/checkout@v2
-    - name: Merge develop -> actual
-      uses: tukasz/direct-merge-action@master
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        source-branch: develop
-        target-branch: ${{ github.ref }}
+    - name: Crear y moverse a rama release
+      run: |
+        git checkout -b release
+        git push -f -u origin release
   Pruebas-unitarias: 
-    name: UnitTest sobre rama actual
+    name: UnitTest sobre rama release
     needs: Actualizar-rama
     runs-on: ubuntu-latest
     steps:
@@ -49,16 +47,16 @@ jobs:
       run: |
           coverage run -m unittest tests/test_persona.py
           coverage report -m
-  Merge-develop:
-    name: Merge desde rama actual a develop despues de pasar pruebas unitarias
+  Merge-main:
+    name: Merge desde rama release a main 
     needs: Pruebas-unitarias
     runs-on: ubuntu-latest
     steps:
     - name: Checkout de repositorio
       uses: actions/checkout@v2
-    - name: Merge actual -> develop
+    - name: Merge release -> main
       uses: tukasz/direct-merge-action@master
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        source-branch: ${{ github.ref }}
-        target-branch: develop
+        source-branch: release
+        target-branch: main
