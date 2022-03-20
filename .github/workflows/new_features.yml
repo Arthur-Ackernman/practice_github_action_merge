@@ -4,6 +4,7 @@ jobs:
   j1:
     name: Job j1
     runs-on: ubuntu-latest
-    outputs:
-      salida${{ steps.imprimir.outputs.respuesta }}
+    steps:
+    - name: checkout de repositorio
+      uses: actions/checkout@v2
 
