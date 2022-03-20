@@ -5,7 +5,7 @@ on:
 jobs:
   j1:
     name: Job j1
-    if:  ${{ contains(github.event.head_commit.message, 'FEATURE') }}
+    if:  ${{ contains(github.event.head_commit.message, 'FEATURES') }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout de repositorio
