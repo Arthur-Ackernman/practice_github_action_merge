@@ -12,7 +12,6 @@ jobs:
       env: 
         RESULT: Exitoso
       run: echo "::set-output name=respuesta::${RESULT}"
-    - name: Checkout de repositorio
       uses: actions/checkout@v2
     # needs: j1
     # name: UnitTest
