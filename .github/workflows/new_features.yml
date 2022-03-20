@@ -12,11 +12,11 @@ jobs:
       uses: actions/checkout@v2
     - name: Merge develop -> actual
       uses: tukasz/direct-merge-action@master
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          source-branch: develop
-          target-branch: ${{ github.ref }}
-  Pruebas TDD: 
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        source-branch: develop
+        target-branch: ${{ github.ref }}
+  Pruebas unitarias: 
     name: UnitTest sobre rama actual
     needs: Actualizar rama
     runs-on: ubuntu-latest
