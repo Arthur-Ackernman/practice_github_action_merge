@@ -47,4 +47,3 @@ jobs:
       run: |
           coverage run -m unittest tests/test_persona.py
           coverage report -m
-
