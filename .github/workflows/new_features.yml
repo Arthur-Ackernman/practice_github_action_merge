@@ -1,3 +1,9 @@
 name: Pruebas merge
 on: push
+jobs:
+  j1:
+    name: Job j1
+    runs-on: ubuntu-latest
+    outputs:
+      salida${{ steps.imprimir.outputs.respuesta }}
 
