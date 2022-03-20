@@ -1,4 +1,4 @@
-name: Merge a main
+name: Merge a main.
 on: 
   push:
     branches: [ develop ]
