@@ -1,6 +1,6 @@
 name: Pruebas merge
 on: push
-  branches-ignore: [ develop, main, releases ]
+  branches-ignore: [ develop ]
 jobs:
   j1:
     name: Job j1
