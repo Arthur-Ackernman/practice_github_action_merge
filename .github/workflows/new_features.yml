@@ -1,46 +1,64 @@
-name: Pruebas merge
+name: Merge a develop
 on: 
   push:
-    branches-ignore: [ develop ]
+    branches-ignore: [ develop, main, hotfix ]
 jobs:
-  j1:
-    name: Job j1
+  Actualizar-rama:
+    name: Actulizar rama actual con develop
+    if:  ${{ contains(github.event.head_commit.message, 'FEATURES') }}
     runs-on: ubuntu-latest
     steps:
-    - name: Validar rama del commit
-      if: ${{ contains(github.event.head_commit.message, 'FEATURE') }}
-      env:
-        MENSAJE: Ejecutar push
-      run: echo "::set-output name=respuesta::${MENSAJE}"
-    - name: checkout de repositorio
+    - name: Checkout de repositorio
       uses: actions/checkout@v2
-    - name: respuesta de job
+    - name: Merge develop -> actual
+      uses: tukasz/direct-merge-action@master
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        source-branch: develop
+        target-branch: ${{ github.ref }}
+  Pruebas-unitarias: 
+    name: UnitTest sobre rama actual
+    needs: Actualizar-rama
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout de repositorio
+      uses: actions/checkout@v2
+    - name: Configuracion de entorno python
+      uses: actions/setup-python@v2
+      with:
+          python-version: '3.8'
+    - name: Instalacion de librerias y dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Correr pruebas
+      id: correr-pruebas
+      run: python -m unittest -v tests/test_persona.py
+    - name: validar resultado con errores
+      if: ${{ failure() }}
       env: 
-        MENSAJE: Prueba de mensaje
-      run: echo "::set-output name=respuesta::${MENSAJE}"
-# name: Hola mundo
-# on:
-#   push:
-#     branches: [ develop ]
-# jobs:
-#   Mi-primer-job:
-#     name: Mi primer job
-#     runs-on: ubuntu-latest
-#     outputs:
-#       salida: ${{ steps.imprimir.outputs.respuesta }}
-#     steps:
-#     - name: Imprimir
-#       id: imprimir
-#       env:
-#         MI_VARIABLE: Hola mundo
-#       run: echo "::set-output name=respuesta::${MI_VARIABLE}"
-
-#   Mi-segundo-job:
-#     needs: Mi-primer-job
-#     name: Mi segundo job
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Imprimir
-#       id: imprimir
-#       run: echo ${{needs.Mi-primer-job.outputs.salida}}
-
+        MENSAJE_ERROR: Una o varias pruebas fallaron
+      run: echo "::set-output name=respuesta::${MENSAJE_EXITOSO}"
+    - name: Validar resultados sin errores
+      if: ${{ success() }}
+      env:
+        MENSAJE_EXITO: Todas las pruebas fueron exitosas
+      run: echo "::set-output name=respuesta::${MENSAJE_EXITO}"
+    - name: Cálcula de cubrimiento
+      id: cubrimiento
+      run: |
+          coverage run -m unittest tests/test_persona.py
+          coverage report -m
+  Merge-develop:
+    name: Merge desde rama actual a develop despues de pasar pruebas unitarias
+    needs: Pruebas-unitarias
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout de repositorio
+      uses: actions/checkout@v2
+    - name: Merge actual -> develop
+      uses: tukasz/direct-merge-action@master
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        source-branch: ${{ github.ref }}
+        target-branch: develop
