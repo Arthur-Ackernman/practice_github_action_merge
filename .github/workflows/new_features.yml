@@ -1,7 +1,7 @@
 name: Pruebas merge
 on: 
   push:
-    branches-ignore: [ develop, main, hotfix ]
+    branches-ignore: [ develop, main ]
 jobs:
   Actualizar-rama:
     name: Actulizar rama actual con develop
