@@ -1,7 +1,7 @@
-name: Pruebas merge
+name: Merge a develop
 on: 
   push:
-    branches-ignore: [ develop, main ]
+    branches-ignore: [ develop, main, hotfix ]
 jobs:
   Actualizar-rama:
     name: Actulizar rama actual con develop
@@ -49,3 +49,16 @@ jobs:
       run: |
           coverage run -m unittest tests/test_persona.py
           coverage report -m
+  Merge-develop:
+    name: Merge desde rama actual a develop despues de pasar pruebas unitarias
+    needs: Pruebas-unitarias
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout de repositorio
+      uses: actions/checkout@v2
+    - name: Merge actual -> develop
+      uses: tukasz/direct-merge-action@master
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        source-branch: ${{ github.ref }}
+        target-branch: develop
