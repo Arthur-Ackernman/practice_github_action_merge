@@ -16,7 +16,7 @@ jobs:
         git push -f -u origin release
   Pruebas-unitarias: 
     name: UnitTest sobre rama release
-    needs: Actualizar-rama
+    needs: Crear-rama
     runs-on: ubuntu-latest
     steps:
     - name: Checkout de repositorio
