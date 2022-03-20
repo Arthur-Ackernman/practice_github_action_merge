@@ -1,0 +1,46 @@
+name: Pruebas merge
+on: 
+  push:
+    branches-ignore: [ develop ]
+jobs:
+  j1:
+    name: Job j1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Validar rama del commit
+      if: ${{ contains(github.event.head_commit.message, 'FEATURE') }}
+      env:
+        MENSAJE: Ejecutar push
+      run: echo "::set-output name=respuesta::${MENSAJE}"
+    - name: checkout de repositorio
+      uses: actions/checkout@v2
+    - name: respuesta de job
+      env: 
+        MENSAJE: Prueba de mensaje
+      run: echo "::set-output name=respuesta::${MENSAJE}"
+# name: Hola mundo
+# on:
+#   push:
+#     branches: [ develop ]
+# jobs:
+#   Mi-primer-job:
+#     name: Mi primer job
+#     runs-on: ubuntu-latest
+#     outputs:
+#       salida: ${{ steps.imprimir.outputs.respuesta }}
+#     steps:
+#     - name: Imprimir
+#       id: imprimir
+#       env:
+#         MI_VARIABLE: Hola mundo
+#       run: echo "::set-output name=respuesta::${MI_VARIABLE}"
+
+#   Mi-segundo-job:
+#     needs: Mi-primer-job
+#     name: Mi segundo job
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Imprimir
+#       id: imprimir
+#       run: echo ${{needs.Mi-primer-job.outputs.salida}}
+
