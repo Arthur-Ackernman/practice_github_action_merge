@@ -1,20 +1,30 @@
-name: Pruebas unitarias con validacion
+name: Merge a main.
 on: 
   push:
     branches: [ develop ]
 jobs:
-  job1:
-    name: Pruebas v3
+  Crear-rama:
+    name: Crear rama realease desde develop
+    if:  ${{ contains(github.event.head_commit.message, 'RELEASE') }}
     runs-on: ubuntu-latest
-    outputs:
-      salida: ${{ steps.imprimir.outputs.respuesta }}
+    steps:
+    - name: Checkout de repositorio
+      uses: actions/checkout@v2
+    - name: Crear y moverse a rama release
+      run: |
+        git checkout -b release
+        git push -f -u origin release
+  Pruebas-unitarias: 
+    name: UnitTest sobre rama release
+    needs: Crear-rama
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout de repositorio
       uses: actions/checkout@v2
     - name: Configuracion de entorno python
       uses: actions/setup-python@v2
       with:
-          python-version: '3.7'
+          python-version: '3.8'
     - name: Instalacion de librerias y dependencias
       run: |
         python -m pip install --upgrade pip
@@ -37,3 +47,16 @@ jobs:
       run: |
           coverage run -m unittest tests/test_persona.py
           coverage report -m
+  Merge-main:
+    name: Merge desde rama release a main 
+    needs: Pruebas-unitarias
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout de repositorio
+      uses: actions/checkout@v2
+    - name: Merge release -> main
+      uses: tukasz/direct-merge-action@master
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        source-branch: release
+        target-branch: main
