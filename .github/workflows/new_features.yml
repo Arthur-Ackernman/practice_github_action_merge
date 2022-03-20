@@ -9,15 +9,20 @@ jobs:
     steps:
     - name: Validar rama del commit
       if: ${{ contains(github.event.head_commit.message, 'FEATURE') }}
-      env:
-        MENSAJE: Ejecutar push
-      run: echo "::set-output name=respuesta::${MENSAJE}"
-    - name: checkout de repositorio
+    - name: Push from feature branch
+      if: ${{ success() }}
+    - name: Checkout de repositorio
       uses: actions/checkout@v2
-    - name: respuesta de job
-      env: 
-        MENSAJE: Prueba de mensaje
-      run: echo "::set-output name=respuesta::${MENSAJE}"
+    # needs: j1
+    # name: UnitTest
+    # runs-on: ubuntu-latest
+    # steps:
+    # - name: checkout de repositorio
+    #   uses: actions/checkout@v2
+    # - name: respuesta de job
+    #   env: 
+    #     MENSAJE: Prueba de mensaje
+    #   run: echo "::set-output name=respuesta::${MENSAJE}"
 # name: Hola mundo
 # on:
 #   push:
