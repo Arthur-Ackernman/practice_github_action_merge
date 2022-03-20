@@ -3,13 +3,24 @@ on:
   push:
     branches-ignore: [ develop, main, hotfix ]
 jobs:
-  j1:
-    name: Job j1
+  Actualizar rama:
+    name: Actulizar rama actual con develop
     if:  ${{ contains(github.event.head_commit.message, 'FEATURES') }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout de repositorio
       uses: actions/checkout@v2
+    - name: Merge develop -> actual
+      uses: tukasz/direct-merge-action@master
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          source-branch: develop
+          target-branch: ${{ github.ref }}
+  Pruebas TDD: 
+    name: UnitTest sobre rama actual
+    needs: Actualizar rama
+    runs-on: ubuntu-latest
+    steps:
     - name: Configuracion de entorno python
       uses: actions/setup-python@v2
       with:
@@ -36,41 +47,4 @@ jobs:
       run: |
           coverage run -m unittest tests/test_persona.py
           coverage report -m
-      
- 
-    # needs: j1
-    # name: UnitTest
-    # runs-on: ubuntu-latest
-    # steps:
-    # - name: checkout de repositorio
-    #   uses: actions/checkout@v2
-    # - name: respuesta de job
-    #   env: 
-    #     MENSAJE: Prueba de mensaje
-    #   run: echo "::set-output name=respuesta::${MENSAJE}"
-# name: Hola mundo
-# on:
-#   push:
-#     branches: [ develop ]
-# jobs:
-#   Mi-primer-job:
-#     name: Mi primer job
-#     runs-on: ubuntu-latest
-#     outputs:
-#       salida: ${{ steps.imprimir.outputs.respuesta }}
-#     steps:
-#     - name: Imprimir
-#       id: imprimir
-#       env:
-#         MI_VARIABLE: Hola mundo
-#       run: echo "::set-output name=respuesta::${MI_VARIABLE}"
-
-#   Mi-segundo-job:
-#     needs: Mi-primer-job
-#     name: Mi segundo job
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Imprimir
-#       id: imprimir
-#       run: echo ${{needs.Mi-primer-job.outputs.salida}}
 
